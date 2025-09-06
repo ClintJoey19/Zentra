@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getSessionCookie } from "better-auth/cookies";
 
-export const middleware = (request: NextRequest) => {
+const authRoutes = ["/auth/sign-in", "/auth/sign-up"];
+const protectedRoutes = ["/dashboard/organizations"];
+
+export const middleware = async (request: NextRequest) => {
   // todo
   const pathname = request.nextUrl.pathname;
 
@@ -12,6 +16,18 @@ export const middleware = (request: NextRequest) => {
     return NextResponse.redirect(
       new URL("/dashboard/organizations", request.nextUrl)
     );
+  }
+
+  const sessionCookie = getSessionCookie(request);
+  const isAuthRoute = authRoutes.includes(pathname);
+  const isProtectedRoute = protectedRoutes.includes(pathname);
+
+  if (sessionCookie && isAuthRoute) {
+    return NextResponse.redirect(new URL("/", request.nextUrl));
+  }
+
+  if (!sessionCookie && isProtectedRoute) {
+    return NextResponse.redirect(new URL("/auth/sign-in", request.nextUrl));
   }
 
   return NextResponse.next();
