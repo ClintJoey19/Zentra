@@ -1,6 +1,13 @@
 "use client";
 import { authClient } from "@/lib/auth-client";
-import { signOut } from "@/lib/services/auth.service";
+import {
+  signInWithEmailAndPassword,
+  signInWithSocialProvider,
+  signOut,
+  SignUpEmailAndPasswordCredentials,
+  signUpWithEmailAndPassword,
+  SocialProvider,
+} from "@/lib/services/auth.service";
 import { useRouter } from "next/navigation";
 
 const useAuth = () => {

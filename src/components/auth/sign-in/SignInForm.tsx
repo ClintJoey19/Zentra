@@ -19,6 +19,7 @@ import { Label } from "@/components/ui/label";
 import {
   signInWithEmailAndPassword,
   signInWithSocialProvider,
+  SocialProvider,
 } from "@/lib/services/auth.service";
 import { cn } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -48,6 +49,19 @@ const SignInForm = ({ className, ...props }: React.ComponentProps<"div">) => {
   const { isSubmitting } = form.formState;
   const router = useRouter();
 
+  const handleSocialProviderSignIn = async (provider: SocialProvider) => {
+    try {
+      const response = await signInWithSocialProvider(provider);
+
+      if (response?.error) throw new Error(response.error.message);
+
+      toast.success("Login successfully");
+      router.push("/dashboard/organizations");
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
       const { email, password } = values;
@@ -76,7 +90,7 @@ const SignInForm = ({ className, ...props }: React.ComponentProps<"div">) => {
               <Button
                 variant="outline"
                 className="w-full"
-                onClick={async () => await signInWithSocialProvider("google")}
+                onClick={() => handleSocialProviderSignIn("google")}
               >
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                   <path

@@ -23,7 +23,9 @@ export const middleware = async (request: NextRequest) => {
   const isProtectedRoute = protectedRoutes.includes(pathname);
 
   if (sessionCookie && isAuthRoute) {
-    return NextResponse.redirect(new URL("/", request.nextUrl));
+    return NextResponse.redirect(
+      new URL("/dashboard/organizations", request.nextUrl)
+    );
   }
 
   if (!sessionCookie && isProtectedRoute) {

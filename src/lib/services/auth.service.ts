@@ -1,6 +1,6 @@
 import { authClient } from "../auth-client";
 
-type SignUpEmailAndPasswordCredentials = {
+export type SignUpEmailAndPasswordCredentials = {
   name: string;
   email: string;
   password: string;
@@ -36,12 +36,13 @@ export const signInWithEmailAndPassword = async (
   }
 };
 
-type SocialProvider = "google";
+export type SocialProvider = "google";
 
 export const signInWithSocialProvider = async (provider: SocialProvider) => {
   try {
     const response = await authClient.signIn.social({
       provider,
+      callbackURL: "/dashboard/organizations",
     });
 
     return response;

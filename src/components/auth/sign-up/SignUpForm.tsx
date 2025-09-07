@@ -25,6 +25,7 @@ import {
 import {
   signInWithSocialProvider,
   signUpWithEmailAndPassword,
+  SocialProvider,
 } from "@/lib/services/auth.service";
 import { LoaderCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -52,6 +53,19 @@ const SignUpForm = ({
   });
   const { isSubmitting } = form.formState;
   const router = useRouter();
+
+  const handleSocialProviderSignIn = async (provider: SocialProvider) => {
+    try {
+      const response = await signInWithSocialProvider(provider);
+
+      if (response?.error) throw new Error(response.error.message);
+
+      toast.success("Login successfully");
+      router.push("/dashboard/organizations");
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
