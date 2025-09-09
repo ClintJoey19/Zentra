@@ -5,7 +5,7 @@ import RootNavbarActions from "./RootNavbarActions";
 
 const RootNavbar = () => {
   return (
-    <div className="w-full h-[8vh] px-4 flex items-center justify-between gap-4">
+    <div className="w-full h-[6vh] px-4 flex items-center justify-between gap-4">
       <RootNavbarLogo />
       <RootNavbarLinks />
       <RootNavbarActions />

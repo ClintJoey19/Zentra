@@ -27,10 +27,10 @@ export default function layout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} bg-muted antialiased`}
       >
         <DashboardNavbar />
-        {children}
+        <main className="px-4 pb-4 pt-[calc(6vh+1rem)]">{children}</main>
         <Toaster />
       </body>
     </html>

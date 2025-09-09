@@ -4,11 +4,11 @@ import React from "react";
 
 const DashboardNavbar = () => {
   return (
-    <div className="w-full h-[5vh] flex justify-between items-center px-4">
-      <div>
+    <div className="fixed top-0 w-full h-[6vh] bg-background border-b flex justify-between items-center px-4">
+      <div className="h-full flex items-center">
         <SystemLogo />
       </div>
-      <div>
+      <div className="h-full flex items-center">
         <SystemUserDropdown />
       </div>
     </div>
