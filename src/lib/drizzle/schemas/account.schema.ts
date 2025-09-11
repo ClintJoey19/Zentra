@@ -20,3 +20,5 @@ export const account = pgTable("account", {
     .$onUpdate(() => /* @__PURE__ */ new Date())
     .notNull(),
 });
+
+export type Account = typeof account.$inferInsert;
