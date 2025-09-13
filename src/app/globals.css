@@ -1,5 +1,7 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@import "uploadthing/tw/v4";
+@source "../../node_modules/@uploadthing/react/dist";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -125,4 +127,12 @@
   .page-title {
     @apply text-3xl font-medium;
   }
+}
+
+/* globals.css */
+.my-ut > *[data-ut-element="button"] {
+  @apply bg-primary text-white rounded-md px-4 py-2;
+}
+.my-ut > *[data-ut-element="button"][data-state="uploading"] {
+  @apply opacity-50 cursor-not-allowed;
 }

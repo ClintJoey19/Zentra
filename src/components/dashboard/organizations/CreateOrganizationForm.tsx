@@ -1,4 +1,5 @@
 "use client";
+import SystemUploadDropzone from "@/components/system/SystemUploadDropzone";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -20,6 +21,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { UploadButton, UploadDropzone } from "@/lib/utils/uploadthing";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { LoaderCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -28,11 +30,9 @@ import z from "zod";
 
 const formSchema = z.object({
   name: z.string().min(1, { message: "Organization's name field is required" }),
-  slug: z
-    .string()
-    .min(4, {
-      message: "Organization's domain should be atleast 4 characters",
-    }),
+  slug: z.string().min(4, {
+    message: "Organization's domain should be atleast 4 characters",
+  }),
   logo: z.instanceof(File).optional(),
   metadata: z.object({
     background: z.instanceof(File).optional(),
@@ -54,6 +54,31 @@ const CreateOrganizationForm = () => {
   const { isSubmitting } = form.formState;
   const router = useRouter();
 
+  // const handleImageChange = async (e, fieldChange) => {
+  //   try {
+  //     e.preventDefault()
+
+  //     const fileReader = new FileReader()
+
+  //     const files = e.target.files;
+
+  //     if (files || files.length === 0) return
+
+  //     const file = files[0]
+
+  //     fileReader.onload = async (event) => {
+  //       const imageUrl = event.target?.result?.toString() || ""
+
+  //       fieldChange(imageUrl)
+  //     }
+
+  //     fileReader.readAsDataURL(file)
+  //   } catch (error) {
+  //     console.error(error);
+
+  //   }
+  // }
+
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
       console.log(values);
@@ -71,8 +96,8 @@ const CreateOrganizationForm = () => {
         <AlertDialogHeader>
           <AlertDialogTitle>New Organization</AlertDialogTitle>
           <AlertDialogDescription>
-            Lorem ipsum dolor, sit amet consectetur adipisicing elit. Officia
-            voluptatum in, at dolores iure nulla?
+            Create your organization to collaborate with your team. You can
+            customize settings later.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <div className="flex flex-col gap-4">
@@ -119,11 +144,11 @@ const CreateOrganizationForm = () => {
                   <FormItem>
                     <FormLabel>Logo</FormLabel>
                     <FormControl>
-                      <Input
-                        type="file"
-                        accept="image/*"
-                        onChange={(e) => field.onChange(e.target.files?.[0])}
-                        disabled={isSubmitting}
+                      <SystemUploadDropzone
+                        endpoint="imageUploader"
+                        onClientUploadComplete={(res) => {
+                          console.log(res);
+                        }}
                       />
                     </FormControl>
                     <FormMessage />
