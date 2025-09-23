@@ -1,4 +1,4 @@
-import { GalleryVerticalEnd } from "lucide-react";
+import { Zap } from "lucide-react";
 import Link from "next/link";
 import React from "react";
 
@@ -10,7 +10,7 @@ const SystemLogo = () => {
         className="flex items-center gap-2 self-center text-xl font-medium"
       >
         <div className="bg-primary text-primary-foreground flex size-6 items-center justify-center rounded-md">
-          <GalleryVerticalEnd className="size-4" />
+          <Zap className="size-4" />
         </div>
         Zentra
       </Link>
