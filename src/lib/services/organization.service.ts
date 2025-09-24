@@ -1,20 +1,23 @@
 import { APIError } from "better-auth";
 import { authClient } from "../auth-client";
+import organizationRepository from "../dal/organizations.dal";
 
-type OrganizationInput = {
+type OrganizationServiceInput = {
   name: string;
   slug: string;
   logo?: File;
-  metadata: {
+  metadata?: {
     background?: File;
   };
 };
 
-export const createOrganization = async (organization: OrganizationInput) => {
+export const createOrganization = async (
+  organization: OrganizationServiceInput
+) => {
   try {
-    const isSlugTaken = await authClient.organization.checkSlug({
-      slug: organization?.slug,
-    });
+    const isSlugTaken = await organizationRepository.checkOrgnizationSlug(
+      organization?.slug
+    );
 
     if (isSlugTaken)
       throw new APIError("NOT_ACCEPTABLE", {
@@ -25,16 +28,15 @@ export const createOrganization = async (organization: OrganizationInput) => {
     const logo = "";
     const background = "";
 
-    const response = await authClient.organization.create({
+    const newOrganization = await organizationRepository.createOrganization({
       ...organization,
       logo,
       metadata: {
         background,
       },
-      keepCurrentActiveOrganization: false,
     });
 
-    return response;
+    return newOrganization;
   } catch (error) {
     console.error(error);
   }
