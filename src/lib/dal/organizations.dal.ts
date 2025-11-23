@@ -1,25 +1,23 @@
+import { headers } from "next/headers";
 import { authClient } from "../auth-client";
+import { db } from "../drizzle";
+import { organization } from "../drizzle/schemas/organization.schema";
+import { member } from "../drizzle/schemas/member.schema";
+import { eq } from "drizzle-orm";
+import { user } from "../drizzle/schemas/user.schema";
 
 const checkOrgnizationSlug = async (slugInput: string) => {
-  try {
-    const isSlugTaken = await authClient.organization.checkSlug({
-      slug: slugInput,
-    });
+  const isSlugTaken = await authClient.organization.checkSlug({
+    slug: slugInput,
+  });
 
-    return isSlugTaken;
-  } catch (error) {
-    console.error(error);
-    throw error;
-  }
+  return isSlugTaken;
 };
 
 type OrganizationDALInput = {
   name: string;
   slug: string;
   logo?: string;
-  metadata?: {
-    background?: string;
-  };
 };
 
 const createOrganization = async (organization: OrganizationDALInput) => {
@@ -36,8 +34,20 @@ const createOrganization = async (organization: OrganizationDALInput) => {
   }
 };
 
+const listOrganizations = async () => {
+  try {
+    const organizations = await authClient.organization.list();
+
+    return organizations.data;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+
 const organizationRepository = {
   checkOrgnizationSlug,
+  listOrganizations,
   createOrganization,
 };
 

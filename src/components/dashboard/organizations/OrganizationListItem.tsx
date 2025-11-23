@@ -1,15 +1,8 @@
 import { Card } from "@/components/ui/card";
+import { Organization } from "@/lib/drizzle/schemas/organization.schema";
 import Image from "next/image";
 import Link from "next/link";
 import React, { Ref } from "react";
-
-type Organization = {
-  id: string;
-  name: string;
-  description: string;
-  logo: string;
-  background: string;
-};
 
 type OrganizationListItemProps = {
   organization: Organization;
@@ -20,7 +13,7 @@ const OrganizationListItem = ({
   organization,
   ref,
 }: OrganizationListItemProps) => {
-  const { id, name, description, logo, background } = organization;
+  const { id, name, logo } = organization;
 
   return (
     <Link href={`/dashboard/organizations/${id}`}>
@@ -28,14 +21,14 @@ const OrganizationListItem = ({
         <div className="flex flex-col">
           <div className="bg-muted border-b w-full aspect-video relative">
             <Image
-              src={background}
+              src={"/next.svg"}
               alt="organization-background"
               className="object-scale-down"
               fill
             />
             <div className="absolute bottom-2 left-2 bg-slate-900 rounded-md shadow-xl p-3 overflow-hidden">
               <Image
-                src={logo}
+                src={logo || "./vercel.svg"}
                 alt="organization-logo"
                 className="object-contain"
                 width={24}
@@ -45,7 +38,6 @@ const OrganizationListItem = ({
           </div>
           <div className="flex flex-col p-2">
             <span className="font-semibold">{name}</span>
-            <p className="text-sm text-muted-foreground">{description}</p>
           </div>
         </div>
       </Card>

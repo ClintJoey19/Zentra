@@ -1,20 +1,25 @@
+"use server";
 import { APIError } from "better-auth";
-import { authClient } from "../auth-client";
 import organizationRepository from "../dal/organizations.dal";
+import { getServerSession } from "../server/session.server";
 
 type OrganizationServiceInput = {
   name: string;
   slug: string;
-  logo?: File;
-  metadata?: {
-    background?: File;
-  };
+  logo?: string;
 };
 
 export const createOrganization = async (
   organization: OrganizationServiceInput
 ) => {
   try {
+    const session = await getServerSession();
+
+    if (!session)
+      throw new APIError("UNAUTHORIZED", {
+        message: "Unauthorized user",
+      });
+
     const isSlugTaken = await organizationRepository.checkOrgnizationSlug(
       organization?.slug
     );
@@ -24,16 +29,8 @@ export const createOrganization = async (
         message: "Organization domain is already taken",
       });
 
-    // TODO: upload logo and background to uploadthing
-    const logo = "";
-    const background = "";
-
     const newOrganization = await organizationRepository.createOrganization({
       ...organization,
-      logo,
-      metadata: {
-        background,
-      },
     });
 
     return newOrganization;
@@ -52,7 +49,16 @@ export const getOrganization = async () => {
 
 export const getOrganizations = async () => {
   try {
-    const response = await authClient.organization.list();
+    const session = await getServerSession();
+
+    if (!session)
+      throw new APIError("UNAUTHORIZED", {
+        message: "Unauthorized user",
+      });
+
+    console.log(session.user);
+
+    const response = await organizationRepository.listOrganizations();
 
     return response;
   } catch (error) {

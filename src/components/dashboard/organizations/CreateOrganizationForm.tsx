@@ -1,8 +1,6 @@
 "use client";
-import SystemUploadDropzone from "@/components/system/SystemUploadDropzone";
 import {
   AlertDialog,
-  AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
@@ -21,9 +19,12 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { UploadButton, UploadDropzone } from "@/lib/utils/uploadthing";
+import { createOrganization } from "@/lib/services/organization.service";
+import { convertImageToBase64 } from "@/lib/utils";
+import { useUploadThing } from "@/lib/utils/uploadthing";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { LoaderCircle } from "lucide-react";
+import { Image as NoImage, LoaderCircle } from "lucide-react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import z from "zod";
@@ -34,9 +35,7 @@ const formSchema = z.object({
     message: "Organization's domain should be atleast 4 characters",
   }),
   logo: z.instanceof(File).optional(),
-  metadata: z.object({
-    background: z.instanceof(File).optional(),
-  }),
+  // logo: z.string().min(1, { message: "Organization's logo field is required" }),
 });
 
 const CreateOrganizationForm = () => {
@@ -46,42 +45,30 @@ const CreateOrganizationForm = () => {
       name: "",
       slug: "",
       logo: undefined,
-      metadata: {
-        background: undefined,
-      },
     },
   });
   const { isSubmitting } = form.formState;
+  const { startUpload, isUploading } = useUploadThing("imageUploader");
   const router = useRouter();
-
-  // const handleImageChange = async (e, fieldChange) => {
-  //   try {
-  //     e.preventDefault()
-
-  //     const fileReader = new FileReader()
-
-  //     const files = e.target.files;
-
-  //     if (files || files.length === 0) return
-
-  //     const file = files[0]
-
-  //     fileReader.onload = async (event) => {
-  //       const imageUrl = event.target?.result?.toString() || ""
-
-  //       fieldChange(imageUrl)
-  //     }
-
-  //     fileReader.readAsDataURL(file)
-  //   } catch (error) {
-  //     console.error(error);
-
-  //   }
-  // }
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      console.log(values);
+      let orgLogo = "";
+
+      if (values.logo) {
+        const imageRes = await startUpload([values.logo]);
+
+        if (!imageRes) throw new Error("Error uploading the logo");
+
+        orgLogo = imageRes[0].url;
+      }
+
+      const response = await createOrganization({
+        ...values,
+        logo: orgLogo,
+      });
+
+      console.log(response);
     } catch (error) {
       console.error(error);
     }
@@ -113,7 +100,7 @@ const CreateOrganizationForm = () => {
                       <Input
                         {...field}
                         placeholder="Your organization's name"
-                        disabled={isSubmitting}
+                        disabled={isSubmitting || isUploading}
                       />
                     </FormControl>
                     <FormMessage />
@@ -130,7 +117,7 @@ const CreateOrganizationForm = () => {
                       <Input
                         {...field}
                         placeholder="Your organization's domain"
-                        disabled={isSubmitting}
+                        disabled={isSubmitting || isUploading}
                       />
                     </FormControl>
                     <FormMessage />
@@ -143,30 +130,29 @@ const CreateOrganizationForm = () => {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Logo</FormLabel>
-                    <FormControl>
-                      <SystemUploadDropzone
-                        endpoint="imageUploader"
-                        onClientUploadComplete={(res) => {
-                          console.log(res);
-                        }}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                name="metadata.background"
-                control={form.control}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Background image</FormLabel>
+                    {/* <div className="w-full flex justify-center items-center">
+                      {!field.value ? (
+                        <NoImage className="text-muted-foreground size-12" />
+                      ) : (
+                        <Image
+                          src={field.value}
+                          alt="organization-logo"
+                          className="object-contain rounded-md"
+                          width={60}
+                          height={60}
+                        />
+                      )}
+                    </div> */}
                     <FormControl>
                       <Input
                         type="file"
                         accept="image/*"
-                        onChange={(e) => field.onChange(e.target.files?.[0])}
-                        disabled={isSubmitting}
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+
+                          field.onChange(file);
+                        }}
+                        disabled={isSubmitting || isUploading}
                       />
                     </FormControl>
                     <FormMessage />
@@ -176,7 +162,7 @@ const CreateOrganizationForm = () => {
               <AlertDialogFooter>
                 <AlertDialogCancel>Cancel</AlertDialogCancel>
                 <Button type="submit">
-                  {isSubmitting ? (
+                  {isSubmitting || isUploading ? (
                     <LoaderCircle className="animate-spin" />
                   ) : (
                     "Create"
